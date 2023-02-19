@@ -1,15 +1,22 @@
-import React from 'react';
+import React, { Component } from 'react';
 
 import './New-task-form.css';
 
-function NewTaskForm() {
-  return (
-    <input
-      className='new-todo'
-      placeholder='What needs to be done?'
-      autoFocus
-    ></input>
-  );
-}
+export default class NewTaskForm extends Component {
+  state = {
+    value: '',
+  };
 
-export default NewTaskForm;
+  render() {
+    return (
+      <form>
+        <input
+          className='new-todo'
+          placeholder='What needs to be done?'
+          autoFocus
+          type='text'
+        ></input>
+      </form>
+    );
+  }
+}

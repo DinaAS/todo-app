@@ -3,31 +3,48 @@ import Header from '../header';
 import NewTaskForm from '../new-task-form';
 import TaskList from '../task-list';
 import Footer from '../footer';
+import React, { Component } from 'react';
 
-function App() {
-  const todos = [
-    { taskName: 'Completed task', status: 'completed', view: 'view', id: 1 },
-    { taskName: 'Editing task', status: 'editing', view: 'view', id: 2 },
-    { taskName: 'Active task', status: 'created', view: 'view', id: 3 },
-  ];
+export default class App extends Component {
+  state = {
+    todos: [
+      { taskName: 'Completed task', status: 'created', id: 1 },
+      { taskName: 'Editing task', status: 'created', id: 2 },
+      { taskName: 'Active task', status: 'created', id: 3 },
+    ],
+  };
 
-  const completed = todos.reduce((acc, item) => {
+  completed = this.state.todos.reduce((acc, item) => {
     if (item.status === 'completed') {
       acc++;
     }
     return acc;
   }, 0);
 
-  return (
-    <div className='todoapp'>
-      <Header />
-      <NewTaskForm />
-      <section className='main'>
-        <TaskList todos={todos} />
-        <Footer completed={completed} />
-      </section>
-    </div>
-  );
-}
+  deleteTask = (id) => {
+    this.setState(({ todos }) => {
+      let idx = todos.findIndex((el) => el.id === id);
+      const newArray = todos.filter((el, index) => index !== idx);
+      return {
+        todos: newArray,
+      };
+    });
+  };
 
-export default App;
+  addTask = (text) => {
+    console.log('Add', text);
+  };
+
+  render() {
+    return (
+      <div className='todoapp'>
+        <Header />
+        <NewTaskForm onAdded={this.addTask} />
+        <section className='main'>
+          <TaskList todos={this.state.todos} onDeleted={this.deleteTask} />
+          <Footer completed={this.state.completed} />
+        </section>
+      </div>
+    );
+  }
+}
