@@ -1,14 +1,26 @@
 import React from 'react';
 import TasksFilter from '../tasks-filter';
 
-import './Footer.css';
+import './footer.css';
 
-function Footer({ completed }) {
+function Footer({
+  countTodo,
+  onDeleteCompletedTask,
+  onActiveTasks,
+  onCompletedTasks,
+  onAllTasks,
+}) {
   return (
     <footer className='footer'>
-      <span className='todocount'>{completed} items left</span>
-      <TasksFilter />
-      <button className='clear-completed'>Clear completed</button>
+      <span className='todocount'>{countTodo} items left</span>
+      <TasksFilter
+        onActiveTasks={onActiveTasks}
+        onCompletedTasks={onCompletedTasks}
+        onAllTasks={onAllTasks}
+      />
+      <button className='clear-completed' onClick={onDeleteCompletedTask}>
+        Clear completed
+      </button>
     </footer>
   );
 }

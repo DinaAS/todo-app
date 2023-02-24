@@ -1,4 +1,4 @@
-import './App.css';
+import './app.css';
 import Header from '../header';
 import NewTaskForm from '../new-task-form';
 import TaskList from '../task-list';
@@ -6,20 +6,25 @@ import Footer from '../footer';
 import React, { Component } from 'react';
 
 export default class App extends Component {
+  idItem = 1;
+
   state = {
     todos: [
-      { taskName: 'Completed task', status: 'created', id: 1 },
-      { taskName: 'Editing task', status: 'created', id: 2 },
-      { taskName: 'Active task', status: 'created', id: 3 },
+      this.createTask('Completed task'),
+      this.createTask('Editing task'),
+      this.createTask('Active task'),
     ],
   };
 
-  completed = this.state.todos.reduce((acc, item) => {
-    if (item.status === 'completed') {
-      acc++;
-    }
-    return acc;
-  }, 0);
+  createTask(taskName) {
+    return {
+      taskName,
+      done: false,
+      edit: false,
+      view: true,
+      id: this.idItem++,
+    };
+  }
 
   deleteTask = (id) => {
     this.setState(({ todos }) => {
@@ -32,17 +37,132 @@ export default class App extends Component {
   };
 
   addTask = (text) => {
-    console.log('Add', text);
+    const newTask = this.createTask(text);
+
+    this.setState(({ todos }) => {
+      const newArray = [...todos, newTask];
+      return {
+        todos: newArray,
+      };
+    });
+  };
+
+  toggleProperty(arr, id, propertyName) {
+    const index = arr.findIndex((elem) => elem.id === id);
+
+    const oldItem = arr[index];
+    const newItem = { ...oldItem, [propertyName]: !oldItem[propertyName] };
+
+    return [...arr.slice(0, index), newItem, ...arr.slice(index + 1)];
+  }
+
+  onToggleDone = (id) => {
+    this.setState(({ todos }) => {
+      return {
+        todos: this.toggleProperty(todos, id, 'done'),
+      };
+    });
+  };
+
+  onEdit = (id, text) => {
+    const { todos } = this.state;
+    const index = todos.findIndex((elem) => elem.id === id);
+    const oldItem = todos[index];
+
+    const newItem = { ...oldItem, taskName: text, edit: !oldItem.edit };
+    const newArray = [
+      ...todos.slice(0, index),
+      newItem,
+      ...todos.slice(index + 1),
+    ];
+
+    this.setState(({ todos }) => {
+      return {
+        todos: newArray,
+      };
+    });
+  };
+
+  deleteCompletedTask = () => {
+    this.setState(({ todos }) => {
+      const newArray = todos.filter((el) => el.done === false);
+      return {
+        todos: newArray,
+      };
+    });
+  };
+
+  activeTasks = () => {
+    this.setState(({ todos }) => {
+      const newArray = todos.map((el) => {
+        if (el.done === true) {
+          el.view = false;
+          return el;
+        } else {
+          el.view = true;
+          return el;
+        }
+      });
+
+      return {
+        todos: newArray,
+      };
+    });
+  };
+
+  allTasks = () => {
+    this.setState(({ todos }) => {
+      const newArray = todos.map((el) => {
+        el.view = true;
+        return el;
+      });
+
+      return {
+        todos: newArray,
+      };
+    });
+  };
+
+  completedTasks = () => {
+    this.setState(({ todos }) => {
+      const newArray = todos.map((el) => {
+        if (el.done === true) {
+          el.view = true;
+          return el;
+        } else {
+          el.view = false;
+          return el;
+        }
+      });
+
+      return {
+        todos: newArray,
+      };
+    });
   };
 
   render() {
+    const countTodo = this.state.todos.filter((el) => el.done === false).length;
+
     return (
       <div className='todoapp'>
         <Header />
         <NewTaskForm onAdded={this.addTask} />
         <section className='main'>
-          <TaskList todos={this.state.todos} onDeleted={this.deleteTask} />
-          <Footer completed={this.state.completed} />
+          <TaskList
+            todos={this.state.todos}
+            onDeleted={this.deleteTask}
+            onToggleDone={this.onToggleDone}
+            onEditing={this.onEdit}
+          />
+          <Footer
+            todos={this.state.todos}
+            countTodo={countTodo}
+            onDeleteCompletedTask={this.deleteCompletedTask}
+            onActiveTasks={this.activeTasks}
+            onAllTasks={this.allTasks}
+            onCompletedTasks={this.completedTasks}
+          />
         </section>
       </div>
     );
