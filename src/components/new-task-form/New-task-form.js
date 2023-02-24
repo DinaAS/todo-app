@@ -1,8 +1,14 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import './new-task-form.css';
 
 export default class NewTaskForm extends Component {
+  static propTypes = {
+    onSubmit: PropTypes.func,
+    onTaskChange: PropTypes.func,
+  };
+
   state = {
     task: '',
   };
@@ -15,7 +21,9 @@ export default class NewTaskForm extends Component {
 
   onSubmit = (e) => {
     e.preventDefault();
-    this.props.onAdded(this.state.task);
+    if (this.state.task && this.state.task !== ' ') {
+      this.props.onAdded(this.state.task);
+    }
     this.setState({
       task: '',
     });

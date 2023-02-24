@@ -9,11 +9,7 @@ export default class App extends Component {
   idItem = 1;
 
   state = {
-    todos: [
-      this.createTask('Completed task'),
-      this.createTask('Editing task'),
-      this.createTask('Active task'),
-    ],
+    todos: [],
   };
 
   createTask(taskName) {
@@ -22,6 +18,7 @@ export default class App extends Component {
       done: false,
       edit: false,
       view: true,
+      updateText: '',
       id: this.idItem++,
     };
   }
@@ -64,18 +61,24 @@ export default class App extends Component {
     });
   };
 
-  onEdit = (id, text) => {
+  onEdit = (id) => {
+    this.setState(({ todos }) => {
+      return {
+        todos: this.toggleProperty(todos, id, 'edit'),
+      };
+    });
+  };
+
+  updateTask = (id, text) => {
     const { todos } = this.state;
     const index = todos.findIndex((elem) => elem.id === id);
     const oldItem = todos[index];
-
-    const newItem = { ...oldItem, taskName: text, edit: !oldItem.edit };
+    const newItem = { ...oldItem, taskName: text, edit: false };
     const newArray = [
       ...todos.slice(0, index),
       newItem,
       ...todos.slice(index + 1),
     ];
-
     this.setState(({ todos }) => {
       return {
         todos: newArray,
@@ -154,6 +157,7 @@ export default class App extends Component {
             onDeleted={this.deleteTask}
             onToggleDone={this.onToggleDone}
             onEditing={this.onEdit}
+            onUpdate={this.updateTask}
           />
           <Footer
             todos={this.state.todos}

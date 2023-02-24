@@ -1,18 +1,41 @@
 import React, { Component } from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import ruLocale from 'date-fns/locale/ru';
+import PropTypes from 'prop-types';
 
 import './task.css';
 
 export default class Task extends Component {
+  static propTypes = {
+    taskName: PropTypes.string,
+    onDeleted: PropTypes.func,
+    done: PropTypes.bool,
+    edit: PropTypes.bool,
+    view: PropTypes.bool,
+    onToggleDone: PropTypes.func,
+    onEditing: PropTypes.func,
+  };
+
   state = {
     task: '',
   };
 
-  date = formatDistanceToNow(Date.now(), { includesSeconds: true });
+  dateCreate = new Date();
+
+  date = formatDistanceToNow(this.dateCreate, 'ddd/MMM/D/YYYY/hh/m/ss', {
+    includesSeconds: true,
+    addSuffix: true,
+    locale: ruLocale,
+  });
 
   onSubmit = (e) => {
     e.preventDefault();
-    this.props.onEditing(this.props.id, this.state.task);
+    this.props.onUpdate(this.props.id, this.state.task);
+    this.setState((state) => {
+      return {
+        task: '',
+      };
+    });
   };
 
   onChange = (e) => {
@@ -47,6 +70,7 @@ export default class Task extends Component {
               className='edit'
               autoFocus
               onChange={this.onChange}
+              // value={taskName}
             />
           </form>
         )}
@@ -61,7 +85,7 @@ export default class Task extends Component {
           ></input>
           <label onClick={onToggleDone}>
             <span className='description'>{taskName}</span>
-            <span className='created'>{this.date}</span>
+            <span className='created'>created {this.date} ago</span>
           </label>
           <button className='icon icon-edit' onClick={onEditing}></button>
           <button className='icon icon-destroy' onClick={onDeleted}></button>
